@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include <sstream>
 #include <vector>
 
 using namespace std;
@@ -33,13 +32,13 @@ int main(){
     }
     vals.push_back(l);
   }
-  stringstream s;
-
+  
+  string s = "";
   for(int i = 0; i < 12; i++){
-    s << (res[i] > 0)?1:0;
+    s += ((res[i] > 0)?"1":"0");
   }
 
-  cout << [](int x){ return x * (4095 - x); } (stoi(s.str(),0,2)) << endl;
+  cout << [](int x){ return x * (4095 - x); } (stoi(s,0,2)) << endl;
 
   cout << stoi(o(vals,0,[](int x){ return x >= 0;}),0,2) * stoi(o(vals,0,[](int x){ return x < 0;}),0,2) << endl;
   
