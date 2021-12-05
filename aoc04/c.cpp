@@ -69,7 +69,7 @@ int main(){
   while(s >> x){
     calls.push_back(x);
   }
-  cout << calls.size() << endl;
+
   vector<vector<vector<int>>> boards;
 
   while(getline(f,l)){
