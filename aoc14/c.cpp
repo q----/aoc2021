@@ -2,38 +2,35 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <climits>
 
 using namespace std;
 
-string mid(string t, map<string,string> in){
-  string o = "";
-  for(int i = 0; i < t.size() - 1; i++){
-    o += in[t.substr(i,2)];
-  }
-  return o;
-}
-
-string com(string t, string x){
-  string o = "";
-  for(int i = 0; i < t.size()-1; i++){
-    o += string(1, t[i]) + string(1, x[i]);
-  }
-  o += string(1, t[t.size() -1]);
-  return o;
-}
-
-long long int count(string t){
+long long int count(map<string, long long int> t, string orig){
   map<char,long long int> count;
+  count[orig[0]]++;
+  count[orig[orig.size()-1]]++;
 
-  for(char c : t) count[c]++;
-  long long int min = 1000000000000;
+  for(auto c : t) for(auto x : c.first) count[x] += c.second;
+
+  long long int min = LLONG_MAX;
   long long int max = 0;
+
   for(auto c : count){
     min = (min < c.second)?min:c.second;
     max = (max < c.second)?c.second:max;
   }
 
-  return max - min;
+  return (max - min) / 2;
+}
+
+map<string,long long int> step(map<string, long long int> q, map<string, string> in){
+  map<string, long long int> o;
+  for(auto a : q){
+    o[a.first[0] + in[a.first]] += a.second;
+    o[in[a.first] + a.first[1]] += a.second;
+  }
+  return o;
 }
 
 int main(){
@@ -41,35 +38,25 @@ int main(){
   string t;
   ifstream f("input");
   getline(f,t);
-  //map<string,int> q;
-  //for(int i = 0; i < t.size() - 1; i++)q[t.substr(i,2)]++;
-
-
-
+  
+  map<string,long long int> q;
+  for(int i = 0; i < t.size() - 1; i++) q[t.substr(i,2)]++;
   getline(f,l);
+
+
   map<string,string> in;
-
-
   while(getline(f,l)){
-    string x,y,z;
     stringstream s(l);
+    string x,y,z;
     s >> x >> y >> z;
     in.insert(pair<string,string>(x,z));
   }
 
-  for(int i = 0; i < 10; i++){
-    string x = mid(t, in);
-    t = com(t,x);
-  }
+  for(int i = 0; i < 10; i++) q = step(q, in);
+  cout << count(q, t) << endl;
 
-  cout << count(t) << endl;
-
-  for(int i = 10; i < 40; i++){
-    string x = mid(t, in);
-    t = com(t,x);
-  }
-
-  cout << count(t) << endl;
+  for(int i = 10; i < 40; i++) q = step(q, in);
+  cout << count(q, t) << endl;
 
   return 0;
 }
