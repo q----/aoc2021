@@ -3,6 +3,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <queue>
 #include <climits>
 
 using namespace std;
@@ -23,29 +24,23 @@ int ah(vector<string> x){
     }
   }
   a[pair<int,int>(0,0)] = 0;
-  vector<pair<int,int>> d = {pair<int,int>(0,0)};
+  auto c = [&a](pair<int,int> x, pair<int,int> y){return a[x] > a[y];};
+  priority_queue<pair<int,int>, vector<pair<int,int>>, decltype(c)> d(c, {pair<int,int>(0,0)});
 
   vector<pair<int,int>> dir = {pair<int,int>(1,0),  pair<int,int>(0,1), pair<int,int>(-1,0),  pair<int,int>(0,-1)};
   set<pair<int,int>> v;
-  v.insert(d[0]);
+  v.insert(d.top());
 
   while(a[pair<int,int>(x.size()-1,x[0].size()-1)] == INT_MAX){
-    int min = INT_MAX;
-    int minidx;
-    for(int i = 0; i < d.size(); i++){
-      if(a[d[i]] < min){
-        min = a[d[i]] - (x[d[i].first][d[i].second]-'0')*(d[i].first + d[i].second)/10;
-        minidx = i;
-      }
-    }
+    auto curr = d.top();
+    d.pop();
 
     for(auto g : dir){
-      auto m = g + d[minidx];
+      auto m = g + curr;
       if(m.first < 0 || m.first >= x.size() || m.second < 0 || m.second >= x[0].size()) continue;
-      a[m] = [](int x, int y){return (x < y)?x:y;}(a[m], a[d[minidx]] + x[m.first][m.second] - '0');
-      if(v.insert(m).second) d.push_back(m);
+      a[m] = [](int x, int y){return (x < y)?x:y;}(a[m], a[curr] + x[m.first][m.second] - '0');
+      if(v.insert(m).second) d.push(m);
     }
-    d.erase(d.begin() + minidx);
   }
 
   return a[pair<int,int>(x.size()-1,x[0].size()-1)];
