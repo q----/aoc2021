@@ -43,7 +43,6 @@ int main(){
   for(int i = 0; i < t.size() - 1; i++) q[t.substr(i,2)]++;
   getline(f,l);
 
-
   map<string,string> in;
   while(getline(f,l)){
     stringstream s(l);
