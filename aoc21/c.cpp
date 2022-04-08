@@ -17,11 +17,13 @@ struct g{
 };
 
 const bool operator<(const g& lhs, const g& rhs){
+  if(lhs.p1s + lhs.p2s != rhs.p1s + rhs.p2s) return lhs.p1s + lhs.p2s < rhs.p1s + rhs.p2s;
   if(lhs.p1s != rhs.p1s) return lhs.p1s < rhs.p1s;
   if(lhs.p2s != rhs.p2s) return lhs.p2s < rhs.p2s;
   if(lhs.p1 != rhs.p1) return lhs.p1 < rhs.p1;
   if(lhs.p2 != rhs.p2) return lhs.p2 < rhs.p2;
-  return rhs.p1t;
+  if(lhs.p1t != rhs.p1t) return rhs.p1t;
+  return false;
 }
 
 void roll(int& p1, int& p1s, int& p2, int& p2s, int& d){
@@ -53,6 +55,7 @@ g turn(g s, int roll){
 int main(){
   int p1 = 8;
   int p2 = 5;
+  g init (p1,p2);
   int p1s = 0;
   int p2s = 0;
   int d = 0;
@@ -60,46 +63,32 @@ int main(){
   while(p1s < 1000 && p2s < 1000)roll(p1,p1s,p2,p2s,d);
   cout <<  min(p1s,p2s) * d << endl;
 
-  vector<int> rolls = {3,4,5,6,7,8,9};
-  vector<int> freq = {1,3,6,7,6,3,1};
-
-  g init (p1,p2);
   map<g,long long int> s;
   s[init] = 1;
+  g p1w(0,0);
+  p1w.p1s = 420;
+  g p2w(0,0);
+  p2w.p2s = 420;
+
+  vector<int> rolls = {3,4,5,6,7,8,9};
+  vector<int> freq  = {1,3,6,7,6,3,1};
 
   do{
     auto it = s.begin();
-    if((*it).first.p1s >= 21 || (*it).first.p2s >= 21) break;
-    auto t = *it;
-
+    g t = (*it).first;
+    long long int x = (*it).second;
+    s.erase(it);
     for(int r = 0; r < rolls.size(); r++){
-      g c = turn(t.first, rolls[r]);
-      if(c.p1s >= 21 || c.p2s >= 21){
-        if(c.p1s >= 21){
-          c.p2s = 0;
-          c.p1s = 21;
-        } else {
-          c.p1s = 0;
-          c.p2s = 21;
-        }
-        c.p1 = 0;
-        c.p2 = 0;
-        c.p1t = true;
-      }
-      s[c] += freq[r] * s[t.first];
+      g c = turn(t, rolls[r]);
+      
+      if(c.p1s >= 21 || c.p2s >= 21)
+        c = (c.p1s >= 21)?p1w:p2w;
+
+      s[c] += x * freq[r]; 
     }
-    cout << s.size() << " ";
-    s.erase(t.first);
-    cout << s.size() << endl;
-  } while(true);
+  } while(s.size() > 2);
 
-  long long int max = 0;
-  for(auto t : s)
-    if(t.second > max) max = t.second;
-
-  cout << max << endl;
+  cout << ((s[p1w] > s[p2w])?s[p1w]:s[p2w]) << endl;
 
   return 0;
 }
-
-
