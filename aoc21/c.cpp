@@ -9,6 +9,7 @@ struct g{
   int p1s = 0;
   int p2;
   int p2s = 0;
+  int t = 0;
   bool p1t = true;
   g(int a, int b){
     p1 = a;
@@ -24,20 +25,6 @@ const bool operator<(const g& lhs, const g& rhs){
   if(lhs.p2 != rhs.p2) return lhs.p2 < rhs.p2;
   if(lhs.p1t != rhs.p1t) return rhs.p1t;
   return false;
-}
-
-void roll(int& p1, int& p1s, int& p2, int& p2s, int& d){
-  for(int i = 0; i < 3; i++){
-    d++;
-    p1 = (p1 + d) % 10;
-  }
-  p1s += (p1==0)?10:p1;
-  if(p1s >= 1000) return;
-  for(int i = 0; i < 3; i++){
-    d++;
-    p2 = (p2 + d) % 10;
-  }
-  p2s += (p2==0)?10:p2;
 }
 
 g turn(g s, int roll){
@@ -56,15 +43,13 @@ int main(){
   int p1 = 8;
   int p2 = 5;
   g init (p1,p2);
-  int p1s = 0;
-  int p2s = 0;
-  int d = 0;
 
-  while(p1s < 1000 && p2s < 1000)roll(p1,p1s,p2,p2s,d);
-  cout <<  min(p1s,p2s) * d << endl;
+  while(init.p1s < 1000 && init.p2s < 1000) init = turn(init, ++init.t + ++init.t + ++init.t);
+  cout <<  min(init.p1s,init.p2s) * init.t << endl;
 
+  g init2 (p1,p2);
   map<g,long long int> s;
-  s[init] = 1;
+  s[init2] = 1;
   g p1w(0,0);
   p1w.p1s = 420;
   g p2w(0,0);
